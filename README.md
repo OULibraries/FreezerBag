@@ -22,33 +22,4 @@ optional arguments:
 
 ## Extra credit
 I wrote this with the idea that I would run it repeatedly as a cron job.
-Here's a quickie example of just such a script.
-```
-#!/bin/sh
-PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
-BAGSDIR="/some/directory/with/bags/directly/under/it"
-VAULT="freezerbag_vaultname"
-LOGFILE="/var/log/freezerbag.log"
-EMAIL="email@example.com"
-TODAY=`date`
-
-
-## Go away if we're still running
-(
-  flock -x -w 10 200 || exit 1
-
-  ## Loop through the bags
-  for BAGPATH in `find $BAGSDIR -mindepth 1 -maxdepth 1 -type d`
-  do
-    ## Get the bag name
-    BAGNAME=$(basename "$BAGPATH")
-    echo "$BAGNAME - start $TODAY" > ${LOGFILE} 2>&1
-    ## Execute the freezerbag script with appropriate options
-    ## Send the output to our logfile
-    python /opt/ltp/freezerbag.py --freeze --bag ${BAGNAME} --path ${BAGSDIR} --vault ${VAULT} >> ${LOGFILE} 2>&1
-    echo "$BAGNAME - completed $TODAY" >> ${LOGFILE} 2>&1
-    ## Send one email for each bag
-    mail -s "Freezerbag $BAGNAME - $TODAY" $EMAIL < $LOGFILE
-  done
-) 200>/var/lock/freezer_bag_cronlock
-```
+I banged out some shell scripts to make that happen and put them in a repo called [FreezerBag-ops](https://github.com/OULibraries/FreezerBag-ops).
